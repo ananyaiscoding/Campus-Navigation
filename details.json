@@ -1,0 +1,458 @@
+   "kutir": {
+        "name": "Kutir",
+        "image": "images/departments/kutir.jpg",
+        "openingTime": "8:00 AM",
+        "closingTime": "5:00 PM"
+    },
+    "vidya-mandir": {
+        "name": "Vidya Mandir",
+        "image": "images/departments/IMG-20240731-WA0026.jpg",
+        "openingTime": "8:00 AM",
+        "closingTime": "5:00 PM"
+    },
+    "apaji-department": {
+        "name": "Apaji Department",
+        "image": "images/departments/IMG-20240731-WA0043.jpg",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "natyashala": {
+        "name": "Natyashala",
+        "image": "",
+        "openingTime": "9:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "shanta-kunj": {
+        "name": "Shanta Kunj",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "khaadi-bhandar": {
+        "name": "Khaadi Bhandar (Mandir)",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "karysheel-mahila-aavas": {
+        "name": "Karysheel Mahila Aavas",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "nupur-mandir": {
+        "name": "Nupur Mandir",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "kala-mandir": {
+        "name": "Kala Mandir",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "nritya-natya-vibhag": {
+        "name": "Nirtya and Natya Vibhag",
+        "image": "",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "surya-mandir": {
+        "name": "Surya Mandir",
+        "image": "images/departments/IMG_20240729_181933.jpg",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "shakuntalam": {
+        "name": "Shakuntalam",
+        "image": "images/departments/IMG-20240731-WA0029.jpg",
+        "openingTime": "8:00 AM",
+        "closingTime": "6:00 PM"
+    },
+    "swimming-pool": {
+        "name": "Swimming Pool",
+        "image": "images/grounds/IMG-20240731-WA0028.jpg",
+        "openingTime": "6:00 AM",
+        "closingTime": "8:00 PM"
+    },
+    "cricket-ground": {
+        "name": "Cricket Ground",
+        "image": "images/grounds/IMG-20240731-WA0030.jpg",
+        "openingTime": "6:00 AM",
+        "closingTime": "8:00 PM"
+    },
+    "new-market": {
+        "name": "New Market",
+        "image": "images/markets/IMG_20240729_184259.jpg",
+        "openingTime": "9:00 AM",
+        "closingTime": "8:00 PM"
+    },
+    "banasthali-book-center": {
+        "name": "Banasthali Book Center",
+        "image": "images/markets/IMG-20240731-WA0042.jpg",
+        "openingTime": "9:00 AM",
+        "closingTime": "7:00 PM"
+    },
+    "guest-house":{
+    "name": "Guest House 2", 
+    "image": "", 
+    "openingTime": "24 Hours", 
+    "closingTime": "24 Hours" ,
+},
+'shri-shanta-soudh', 
+    name: 'Shri Shanta Soudh', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-ayanam', 
+    name: 'Shri Shanta Ayanam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sadam', 
+    name: 'Shri Shanta Sadam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-niveshnam', 
+    name: 'Shri Shanta Niveshnam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-ajeeram', 
+    name: 'Shri Shanta Ajeeram', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-vasati', 
+    name: 'Shri Shanta Vasati', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-uthajam', 
+    name: 'Shri Shanta Uthajam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-neri', 
+    name: 'Shri Shanta Neri', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-puri', 
+    name: 'Shri Shanta Puri', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-ayatan', 
+    name: 'Shri Shanta Ayatan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-dhaam', 
+    name: 'Shri Shanta Dhaam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-niketan', 
+    name: 'Shri Shanta Niketan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-chaityam', 
+    name: 'Shri Shanta Chaityam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-gangotri', 
+    name: 'Shri Shanta Gangotri', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-peetham', 
+    name: 'Shri Shanta Peetham', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-agar', 
+    name: 'Shri Shanta Agar', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-alaya', 
+    name: 'Shri Shanta Alaya', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-bhuvnam', 
+    name: 'Shri Shanta Bhuvnam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-geham', 
+    name: 'Shri Shanta Geham', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-grah', 
+    name: 'Shri Shanta Grah', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-gram', 
+    name: 'Shri Shanta Gram', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-kulum', 
+    name: 'Shri Shanta Kulum', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-lok', 
+    name: 'Shri Shanta Lok', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-nagaram', 
+    name: 'Shri Shanta Nagaram', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-needam', 
+    name: 'Shri Shanta Needam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-nikaye', 
+    name: 'Shri Shanta Nikaye', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-nikunj', 
+    name: 'Shri Shanta Nikunj', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-nishantam', 
+    name: 'Shri Shanta Nishantam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-paleyam', 
+    name: 'Shri Shanta Paleyam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-vihar', 
+    name: 'Shri Shanta Vihar', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-pattnam', 
+    name: 'Shri Shanta Pattnam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sajvanam', 
+    name: 'Shri Shanta Sajvanam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sangam', 
+    name: 'Shri Shanta Sangam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sharanam', 
+    name: 'Shri Shanta Sharanam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sthanam', 
+    name: 'Shri Shanta Sthanam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sthaniyam', 
+    name: 'Shri Shanta Sthaniyam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-tirtham', 
+    name: 'Shri Shanta Tirtham', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-vasam', 
+    name: 'Shri Shanta Vasam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-vastyam', 
+    name: 'Shri Shanta Vastyam', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sadan', 
+    name: 'Shri Shanta Sadan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-aashram', 
+    name: 'Shri Shanta Aashram', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-bhavan', 
+    name: 'Shri Shanta Bhavan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-sharan', 
+    name: 'Shri Shanta Sharan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-upvan', 
+    name: 'Shri Shanta Upvan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-prangan', 
+    name: 'Shri Shanta Prangan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-prasad', 
+    name: 'Shri Shanta Prasad', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-aangan', 
+    name: 'Shri Shanta Aangan', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-aawas', 
+    name: 'Shri Shanta Aawas', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-niwas', 
+    name: 'Shri Shanta Niwas', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-nilay', 
+    name: 'Shri Shanta Nilay', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+},
+{ 
+    id: 'shri-shanta-puram', 
+    name: 'Shri Shanta Puram', 
+    image: '', 
+    openingTime: '6:30 AM', 
+    closingTime: '8:30 PM' 
+}
