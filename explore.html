@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Explore - Banasthali Vidyapith</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      height: 100vh;
+      background: #EAF8F4;
+      color: #333;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+    .left-column {
+      width: 25%;
+      background-color: #D2F4EA;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      z-index: 2;
+    }
+    .left-column h1 {
+      font-size: 24px;
+      text-align: center;
+      color: #005A4D;
+      margin-bottom: 20px;
+    }
+    .categories a {
+      display: block;
+      padding: 12px;
+      margin: 10px 0;
+      background-color: #B8EAE0;
+      color: #005A4D;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-align: center;
+      cursor: pointer;
+    }
+    .categories a:hover {
+      background-color: #A0DDD2;
+      transform: scale(1.05);
+    }
+    .right-column {
+      width: 75%;
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      background: #F1FCFA;
+      overflow-y: auto;
+    }
+    .search-bar {
+      width: 100%;
+      margin-bottom: 15px;
+      position: sticky;
+      top: 0;
+      background-color: #F1FCFA;
+      z-index: 1;
+    }
+    .search-bar input {
+      width: 95%;
+      margin: 0 auto;
+      display: block;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: 1px solid #A0DDD2;
+      border-radius: 25px;
+      outline: none;
+      background-color: #FFFFFF;
+      color: #333;
+      box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .search-bar input:focus {
+      border-color: #005A4D;
+      box-shadow: 0px 4px 15px rgba(0, 90, 77, 0.2);
+    }
+    .list-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .list-container ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .list-container ul li {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 12px;
+      margin: 8px 0;
+      background-color: #D2F4EA;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      color: #005A4D;
+      cursor: pointer;
+    }
+    .list-container ul li:hover {
+      background-color: #B8EAE0;
+      transform: scale(1.02);
+    }
+    .list-container ul li.visited {
+      background-color: #FFB6B6;
+    }
+    .no-results {
+      font-size: 18px;
+      text-align: center;
+      margin-top: 20px;
+      color: #777;
+    }
+    .scroll-buttons {
+      position: fixed;
+      bottom: 20px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .scroll-buttons button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background: #008080;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .scroll-buttons button:hover {
+      background: #005A4D;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-column">
+      <h1>Explore</h1>
+      <div class="categories">
+        <a onclick="loadCategory('hostels')">Hostels</a>
+        <a onclick="loadCategory('departments')">Departments</a>
+        <a onclick="loadCategory('markets')">Markets</a>
+        <a onclick="loadCategory('grounds')">Grounds</a>
+      </div>
+    </div>
+    <div class="right-column">
+      <div class="search-bar">
+        <input type="text" placeholder="Where are you going?" id="search-bar-input" oninput="handleSearchLive()">
+      </div>
+      <div id="content" class="list-container"></div>
+    </div>
+  </div>
+
+  <script>
+    let visitedLocations = new Set();
+    let currentData = [];
+    let currentCategory = '';
+
+    async function fetchAllCategories() {
+      const categories = ['hostels', 'departments', 'markets', 'grounds'];
+      let combined = [];
+      for (const cat of categories) {
+        try {
+          const res = await fetch(`http://localhost:3001/api/${cat}`);
+          const data = await res.json();
+          combined = [...combined, ...data.map(d => ({ ...d, _category: cat }))];
+        } catch (err) {
+          console.error(`Error loading ${cat}:`, err);
+        }
+      }
+      return combined;
+    }
+
+    function loadCategory(category) {
+      currentCategory = category;
+      fetch(`http://localhost:3001/api/${category}`)
+        .then(response => response.json())
+        .then(data => {
+          currentData = data;
+          displayCategoryResults(category, data);
+        })
+        .catch(err => {
+          console.error('Error fetching category:', err);
+          displayCategoryResults(category, []);
+        });
+    }
+
+    function displayCategoryResults(category, items) {
+      const contentDiv = document.getElementById('content');
+      contentDiv.innerHTML = '';
+
+      if (!items || items.length === 0) {
+        contentDiv.innerHTML = '<p class="no-results">No results found.</p>';
+        return;
+      }
+
+      let html = '<ul>';
+      items.forEach(item => {
+        const itemId = encodeURIComponent(item.id); // ✅ Use actual ID from DB
+        const visitedClass = visitedLocations.has(itemId) ? 'visited' : '';
+
+        html += `<li class="${visitedClass}" onclick="markVisited('${itemId}', '${item._category || category}', '${item.name}')">
+                  ${item.name}
+                </li>`;
+      });
+      html += '</ul>';
+
+      contentDiv.innerHTML = html;
+    }
+
+    async function handleSearchLive() {
+      const query = document.getElementById('search-bar-input').value.toLowerCase();
+      if (!currentData.length || currentCategory === '') {
+        const allData = await fetchAllCategories();
+        currentCategory = 'all';
+        currentData = allData;
+        filterAndDisplay(query);
+      } else {
+        filterAndDisplay(query);
+      }
+    }
+
+    function filterAndDisplay(query) {
+      const filtered = currentData.filter(item => item.name.toLowerCase().includes(query));
+      displayCategoryResults(currentCategory, filtered);
+    }
+
+    function markVisited(itemId, category, name) {
+      visitedLocations.add(itemId);
+      document.querySelectorAll("li").forEach(el => el.classList.remove("visited"));
+      const el = document.querySelector(`li[onclick*="${itemId}"]`);
+      if (el) el.classList.add("visited");
+
+      window.location.href = `details.html?category=${encodeURIComponent(category)}&id=${itemId}&name=${encodeURIComponent(name)}`;
+    }
+
+    function scrollUp() {
+      document.querySelector('.list-container').scrollBy({ top: -100, behavior: 'smooth' });
+    }
+
+    function scrollDown() {
+      document.querySelector('.list-container').scrollBy({ top: 100, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

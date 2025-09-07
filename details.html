@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Details - Carousel Slideshow</title>
+  
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link 
+    rel="stylesheet" 
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap"
+  />
+
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .details-wrapper {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      padding: 30px;
+      position: relative;
+    }
+
+    .card-header {
+      text-align: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .card-header h2 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .back-button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+    .back-button:hover {
+      background-color: #0056b3;
+    }
+
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .image-container {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative; /* so we can place arrows over the image */
+    }
+    #slideshow-image {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    /* Left & Right arrow buttons */
+    .arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0,0,0,0.5);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      line-height: 0;
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    .arrow-btn:hover {
+      background-color: rgba(0,0,0,0.7);
+    }
+    #arrow-left {
+      left: 10px;
+    }
+    #arrow-right {
+      right: 10px;
+    }
+
+    .info-wrapper {
+      width: 100%;
+      max-width: 600px; 
+      margin: 0 auto;
+    }
+    .info {
+      display: flex;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+    .info strong {
+      width: 130px;
+      color: #555;
+    }
+    .info span {
+      color: #777;
+      flex: 1;
+    }
+
+    .nav-button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .nav-button:hover {
+      background-color: #218838;
+    }
+
+    .page-footer {
+      margin-top: 30px;
+      text-align: center;
+      color: #fff;
+      opacity: 0.9;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>Banasthali Vidyapith</h1>
+    <p>Slide between images with arrow buttons</p>
+  </div>
+
+  <div class="details-wrapper">
+    <div class="card-header">
+      <button class="back-button" onclick="goBack()">Back</button>
+      <h2 id="item-title">Item Details</h2>
+    </div>
+    
+    <div class="card-content">
+      <div class="image-container">
+        <!-- Single image we will update -->
+        <img id="slideshow-image" src="" alt="Item Image" />
+        <!-- Left / Right arrow buttons -->
+        <button class="arrow-btn" id="arrow-left">&lt;</button>
+        <button class="arrow-btn" id="arrow-right">&gt;</button>
+      </div>
+
+      <div class="info-wrapper">
+        <div class="info">
+          <strong>Name:</strong>
+          <span id="item-name"></span>
+        </div>
+        <div class="info">
+          <strong>Opening Time:</strong>
+          <span id="opening-time"></span>
+        </div>
+        <div class="info">
+          <strong>Closing Time:</strong>
+          <span id="closing-time"></span>
+        </div>
+        <button class="nav-button" onclick="startNavigation()">Start Navigation</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    &copy; 2025 Banasthali Vidyapith
+  </div>
+
+  <script>
+    src="map.js"
+    /*******************************************
+     * 1. Parse URL params (?category=...&id=...)
+     *******************************************/
+    const urlParams = new URLSearchParams(window.location.search);
+    const category = urlParams.get('category');
+    const itemId   = urlParams.get('id');
+
+    /*******************************************
+     * 2. Your Data (Ensuring Unique IDs)
+     *******************************************/
+    const DATA = {
+        departments: [
+            {
+                id: 'kutir',
+                name: 'Kutir',
+                image: 'images/kutir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '5:00 PM'
+            },
+            {
+                id: 'vidya-mandir',
+                name: 'Vidya Mandir',
+                image:'images/Vidya_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '5:00 PM'
+            },
+            {
+                id: 'apaji', 
+                name: 'Apaji',
+                image: 'images/Apaji.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+        
+          {
+            
+                id: 'apaji-aarogya-mandir', 
+                name: 'Apaji Aarogya Mandir',
+                image: 'images/aarogya.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '8:00 PM'
+          },
+                
+            {
+                id: 'natyashala',
+                name: 'Natyashala',
+                image: '',
+                openingTime: '9:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'shanta-kunj',
+                name: 'Shanta Kunj',
+                image: '',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'khaadi-bhandar',
+                name: 'Khaadi Bhandar (Mandir)',
+                image: 'images/khadi.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'karysheel-mahila-aavas',
+                name: 'Karysheel Mahila Aavas',
+                image: '',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'nupur-mandir',
+                name: 'Nupur Mandir',
+                image: 'images/nupur.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'kala-mandir',
+                name: 'Kala Mandir',
+                image: 'images/kala.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'nritya-natya-vibhag',
+                name: 'Nirtya and Natya Vibhag',
+                image: 'images/NNV.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'surya-mandir',
+                name: 'Surya Mandir',
+                image: 'images/Surya_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'shakuntalam',
+                name: 'Shakuntalam',
+                image: 'images/Shakuntalam.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'vayuyan-hanger',
+                name: 'Vayuyan Hanger',
+                image: 'images/vayu.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'vani-mandir',
+                name: 'Vani Mandir',
+                image: 'images/Vani_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'pustak-mandir',
+                name: 'Pustak Mandir',
+                image: 'images/Pustak_Bhandar.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'jeev-mandir',
+                name: 'Jeev Mandir',
+                image: 'images/Jeev_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'vigyan-mandir',
+                name: 'Vigyan Mandir',
+                image: 'images/Vigyan_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'shilp-mandir',
+                name: 'Shilp Mandir',
+                image: 'images/shilp.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'ratan-mandir',
+                name: 'Ratan Mandir',
+                image: 'images/ratan.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'surr-mandir',
+                name: 'Surr Mandir',
+                image: 'images/surr.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'urja-mandir',
+                name: 'Urja Mandir',
+                image: 'images/urja.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'bhoo-mandir',
+                name: 'Bhoo Mandir',
+                image: 'images/bhoo.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'divakar-mandir',
+                name: 'Divakar Mandir',
+                image: 'images/Automation.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'vidhi-mandir',
+                name: 'Vidhi Mandir',
+                image: 'images/Vidhi_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'shiksha-mandir',
+                name: 'Shiksha Mandir',
+                image: 'images/shiksha.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'utkarsh-mandir',
+                name: 'Utkarsh Mandir',
+                image: 'images/utkarsh.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'karya-mandir',
+                name: 'Karya Mandir',
+                image: 'images/karya.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'vitt-mandir',
+                name: 'Vitt Mandir',
+                image: 'images/vitt.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'nav-mandir',
+                name: 'Nav Mandir',
+                image: 'images/Nav_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'pragya-mandir',
+                name: 'Pragya Mandir',
+                image: 'images/Pragya_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'prabha-mandir',
+                name: 'Prabha Mandir',
+                image: 'images/Prabha_Mandir.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'guest-house', 
+                name: 'Guest House ',
+                image: 'images/guest.jpeg',
+                openingTime: '24 Hours',
+                closingTime: '24 Hours'
+            },
+            {
+                id: 'sharda-mandir', 
+                name: 'Sharda Mandir ',
+                image: 'images/school.jpeg',
+                openingTime: '9:00 AM',
+                closingTime: '2:00 PM'
+            },
+          
+            {
+                id: 'krishi-vigyan-kendra',
+                name: 'Krishi Vigyan Kendra',
+                image: '',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'nursing-school',
+                name: 'Nursing School',
+                image: 'images/nursing.jpeg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            },
+            {
+                id: 'bhram-mandir',
+                name: 'Bhram Mandir',
+                image: 'images/bhram.jpg',
+                openingTime: '8:00 AM',
+                closingTime: '6:00 PM'
+            }
+        ],
+        hostels: [
+ 
+            { 
+                id: 'shri-shanta-soudh', 
+                name: 'Shri Shanta Soudh', 
+                image: 'images/soudh.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-ayanam', 
+                name: 'Shri Shanta Ayanam', 
+                image: 'images/aynam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sadam', 
+                name: 'Shri Shanta Sadam', 
+                image: 'images/sadam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-niveshnam', 
+                name: 'Shri Shanta Niveshnam', 
+                image: 'images/niveshnam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-ajeeram', 
+                name: 'Shri Shanta Ajeeram', 
+                image: 'images/ajeeram.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-vasati', 
+                name: 'Shri Shanta Vasati', 
+                image: 'images/Vasti.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-uthajam', 
+                name: 'Shri Shanta Uthajam', 
+                image: 'images/uthjam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-neri', 
+                name: 'Shri Shanta Neri', 
+                image: 'images/neri.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-puri', 
+                name: 'Shri Shanta Puri', 
+                image: 'images/neri.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-ayatan', 
+                name: 'Shri Shanta Ayatan', 
+                image: 'images/Aytan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-dhaam', 
+                name: 'Shri Shanta Dhaam', 
+                image: 'images/dhaam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-niketan', 
+                name: 'Shri Shanta Niketan', 
+                image: 'images/Niketan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-chaityam', 
+                name: 'Shri Shanta Chaityam', 
+                image: 'images/chaityam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-gangotri', 
+                name: 'Shri Shanta Gangotri', 
+                image: 'images/gangotri.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-peetham', 
+                name: 'Shri Shanta Peetham', 
+                image: 'images/peetham.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-agar', 
+                name: 'Shri Shanta Agar', 
+                image: 'images/aagaar.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-alay', 
+                name: 'Shri Shanta Alay', 
+                image: 'images/aalay.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-bhuvnam', 
+                name: 'Shri Shanta Bhuvnam', 
+                image: 'images/bhuvnam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-geham', 
+                name: 'Shri Shanta Geham', 
+                image: 'images/Geham.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-grah', 
+                name: 'Shri Shanta Grah', 
+                image: 'images/grah.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-gram', 
+                name: 'Shri Shanta Gram', 
+                image: 'images/gram.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-kulum', 
+                name: 'Shri Shanta Kulum', 
+                image: 'images/Kulam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-lok', 
+                name: 'Shri Shanta Lok', 
+                image: 'images/Lok.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nagaram', 
+                name: 'Shri Shanta Nagaram', 
+                image: 'images/nagram.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-needam', 
+                name: 'Shri Shanta Needam', 
+                image: 'images/nidam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nikaye', 
+                name: 'Shri Shanta Nikaye', 
+                image: 'images/nikay.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nikunj', 
+                name: 'Shri Shanta Nikunj', 
+                image: 'images/nikunj.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nishantam', 
+                name: 'Shri Shanta Nishantam', 
+                image: 'images/nishantam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-paleyam', 
+                name: 'Shri Shanta Paleyam', 
+                image: 'images/paleyam,jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-vihar', 
+                name: 'Shri Shanta Vihar', 
+                image: 'images/vihar.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-pattnam', 
+                name: 'Shri Shanta Pattnam', 
+                image: 'images/patnam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sanjavnam', 
+                name: 'Shri Shanta Sanjavnam', 
+                image: 'images/sanjavnam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sangam', 
+                name: 'Shri Shanta Sangam', 
+                image: 'images/sangam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sharanam', 
+                name: 'Shri Shanta Sharanam', 
+                image: 'images/sharanam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sthanam', 
+                name: 'Shri Shanta Sthanam', 
+                image: 'images/sthanam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sthaniyam', 
+                name: 'Shri Shanta Sthaniyam', 
+                image: 'images/ssthaniyam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-tirtham', 
+                name: 'Shri Shanta Tirtham', 
+                image: 'images/Teertham.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-vasam', 
+                name: 'Shri Shanta Vasam', 
+                image: 'images/vasam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-vastyam', 
+                name: 'Shri Shanta Vastyam', 
+                image: 'images/vatsyan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sadan', 
+                name: 'Shri Shanta Sadan', 
+                image: 'images/sadan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-bhavan', 
+                name: 'Shri Shanta Bhavan', 
+                image: 'images/bhavan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-sharan', 
+                name: 'Shri Shanta Sharan', 
+                image: 'images/sharan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-upvan', 
+                name: 'Shri Shanta Upvan', 
+                image: 'images/upvan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-prangan', 
+                name: 'Shri Shanta Prangan', 
+                image: 'images/prangan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-prasad', 
+                name: 'Shri Shanta Prasad', 
+                image: 'images/prasad.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-aangan', 
+                name: 'Shri Shanta Aangan', 
+                image: 'images/aangan.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-aawas', 
+                name: 'Shri Shanta Aawas', 
+                image: 'images/aawas.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-niwas', 
+                name: 'Shri Shanta Niwas', 
+                image: 'images/niwas.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nilay', 
+                name: 'Shri Shanta Nilay', 
+                image: 'images/niay.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-puram', 
+                name: 'Shri Shanta Puram', 
+                image: 'images/puram.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-nigam', 
+                name: 'Shri Shanta Nigam', 
+                image: 'images/Nigam.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+            { 
+                id: 'shri-shanta-aashray', 
+                name: 'Shri Shanta Aashray', 
+                image: 'images/aashray.jpg', 
+                openingTime: '6:30 AM', 
+                closingTime: '8:30 PM' 
+            },
+
+        ],
+        grounds: [
+            { id: 'banasthali-gym', name: 'Banasthali Gym', image: 'images/gym.jpg', openingTime: '6:00 AM', closingTime: '10:00 PM' },
+            { id: 'vidula-maidan', name: 'Vidula Maidan', image: 'images/vidula.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'basketball-court-1', name: 'Basket Ball Court 1', image: 'images/bb1.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'basketball-court-2', name: 'Basket Ball Court 2', image: 'images/bb2.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'judo-center', name: 'Banasthali Judo Center', image: 'images/judo.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'yoga-building', name: 'Banasthali Yoga Building', image: 'images/yoga.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'horse-riding-ground', name: 'Horse Riding Ground', image: 'images/Horse_Riding.jpg', openingTime: '5:00 AM', closingTime: '8:00 PM' },
+            { id: 'shooting-range', name: 'Shooting Range', image: 'images/Shooting_Range.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'cricket-ground', name: 'Cricket Ground', image: 'images/Cricket_Ground.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'swimming-pool', name: 'Swimming Pool', image: 'images/Swimming_Pool.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'air-strip', name: 'Banasthali Air Strip', image: 'images/vayu.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'nehru-park', name: 'Nehru Park', image: 'images/nehru.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'gandhi-park', name: 'Gandhi Park', image: 'images/gandhi.jpg', openingTime: '6:00 AM', closingTime: '8:00 PM' },
+            { id: 'rani-lakshmi-bai-maidan', name: 'Rani Lakshmi Bai Maidan', image: 'images/laxmi.jpg', openingTime: '6:00 AM', closingTime: '6:00 PM' }
+        ],
+        markets: [
+            { id: 'medical-shop', name: 'Medical Shop', image: 'image/medical.jpeg', openingTime: '8:00 AM', closingTime: '9:00 PM' },
+            { id: 'banasthali-book-center', name: 'Banasthali Book Center', image: 'images/BBC.jpg', openingTime: '9:00 AM', closingTime: '7:00 PM' },
+            { id: 'banasthali-computer-center', name: 'Banasthali Computer Center', image: 'images/BCC.jpg', openingTime: '9:00 AM', closingTime: '8:00 PM' },
+            { id: 'new-market', name: 'New Market', image: 'images/New_Market.jpg', openingTime: '9:00 AM', closingTime: '8:00 PM' },
+            { id: 'shanus', name: 'Shanus', image: 'images/shanus.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'fun-and-frolics', name: 'Fun and Frolics', image: 'images/ff.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'annapurna-canteen', name: 'Annapurna Canteen', image: 'images/annpurna.jpg', openingTime: '10:00 AM', closingTime: '9:00 PM' },
+            { id: 'bella-bites', name: 'Bella Bites', image: 'images/bella.jpg', openingTime: '8:00 AM', closingTime: '9:00 PM' },
+            { id: 'pooja-jewellery-shop', name: 'Pooja Jewellery Shop', image: 'images/pooja.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'mohit-photo-studio', name: 'Mohit Photo Studio', image: 'images/mohit.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'ujjwala', name: 'Ujjwala', image: 'images/Ujjwala.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'desi-zayka', name: 'Desi Zayka', image: 'images/Desi_Zayka.jpg', openingTime: '10:00 AM', closingTime: '9:00 PM' },
+            { id: 'mukhteshwari-canteen', name: 'Mukhteshwari Canteen', image: 'images/Canteen.jpg', openingTime: '10:00 AM', closingTime: '9:00 PM' },
+            { id: 'spicy-bite', name: 'Spicy Bite', image: 'images/Canteen.jpg', openingTime: '10:00 AM', closingTime: '9:00 PM' },
+            { id: 'old-market', name: 'Old Market', image: 'images/old.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+            { id: 'anandam-juice-corner', name: 'Anandam Juice Corner', image: 'images/Anandam.jpg', openingTime: '10:00 AM', closingTime: '9:00 PM' },
+            { id: 'digital-world', name: 'Digital World', image: 'images/Digital_World.jpg', openingTime: '10:00 AM', closingTime: '8:00 PM' },
+        ]
+    };
+
+    /*******************************************
+     * 3. Find matching item
+     *******************************************/
+    let itemData = null;
+    if (DATA[category]) {
+      itemData = DATA[category].find(elem => elem.id === itemId);
+    }
+
+    /*******************************************
+     * 4. DOM references
+     *******************************************/
+    const itemTitleEl      = document.getElementById('item-title');
+    const itemNameEl       = document.getElementById('item-name');
+    const openingEl        = document.getElementById('opening-time');
+    const closingEl        = document.getElementById('closing-time');
+    const slideshowImageEl = document.getElementById('slideshow-image');
+    const arrowLeftEl      = document.getElementById('arrow-left');
+    const arrowRightEl     = document.getElementById('arrow-right');
+
+    // We'll keep track of current index if multiple images
+    let currentIndex = 0;
+    let imagesArray = []; // empty by default
+
+    if (itemData) {
+      // Basic text
+      itemTitleEl.textContent = `${itemData.name} Details`;
+      itemNameEl.textContent  = itemData.name;
+      openingEl.textContent   = itemData.openingTime;
+      closingEl.textContent   = itemData.closingTime;
+
+      // Check for multiple images
+      if (Array.isArray(itemData.image)) {
+        imagesArray = itemData.image; 
+      } 
+      else if (typeof itemData.image === 'string' && itemData.image.trim() !== '') {
+        // Single image => treat it like array of length 1
+        imagesArray = [itemData.image]; 
+      } 
+      else {
+        // No image => placeholder array
+        imagesArray = ['https://via.placeholder.com/600x400/cccccc/333333?text=No+Image'];
+      }
+
+      // Show the first image
+      slideshowImageEl.src = imagesArray[currentIndex];
+
+      // If only 1 image, hide arrow buttons
+      if (imagesArray.length === 1) {
+        arrowLeftEl.style.display = 'none';
+        arrowRightEl.style.display = 'none';
+      }
+
+    } else {
+      // Not found
+      itemTitleEl.textContent = 'Item Not Found';
+      itemNameEl.textContent  = 'N/A';
+      openingEl.textContent   = 'N/A';
+      closingEl.textContent   = 'N/A';
+
+      imagesArray = ['https://via.placeholder.com/600x400/cccccc/333333?text=No+Image'];
+      slideshowImageEl.src = imagesArray[0];
+      arrowLeftEl.style.display = 'none';
+      arrowRightEl.style.display = 'none';
+    }
+
+    /*******************************************
+     * 5. Arrow button logic
+     *******************************************/
+    arrowLeftEl.addEventListener('click', () => {
+      // Decrement index, wrap around if needed
+      currentIndex = (currentIndex - 1 + imagesArray.length) % imagesArray.length;
+      slideshowImageEl.src = imagesArray[currentIndex];
+    });
+
+    arrowRightEl.addEventListener('click', () => {
+      // Increment index, wrap around
+      currentIndex = (currentIndex + 1) % imagesArray.length;
+      slideshowImageEl.src = imagesArray[currentIndex];
+    });
+
+    /*******************************************
+     * 6. "Back" button
+     *******************************************/
+    function goBack() {
+      window.history.back();
+      // or: window.location.href = 'explore.html';
+    }
+
+    /*******************************************
+     * 7. "Start Navigation" Redirect
+     *******************************************/
+    function startNavigation() {
+      if (itemData && itemId) {
+        // Construct the URL to CampusNavigation with the destination query parameter
+        // Replace '/campus-navigation' with the actual path to your CampusNavigation component if different
+        const navigationURL = `/map.html?destination=${encodeURIComponent(itemId)}`;
+        window.location.href = navigationURL;
+      } else {
+        alert('Cannot start navigation: Item data is missing.');
+      }
+    }
+  </script>
+</body>
+</html>

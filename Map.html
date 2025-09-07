@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Campus Navigation</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"/>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; font-family: Arial, sans-serif; }
+    #container { display: flex; height: 100vh; width: 100vw; }
+    #map { flex-grow: 1; height: 100%; width: 100%; }
+    #sidebar {
+      width: 300px;
+      background: #fff;
+      padding: 15px;
+      overflow-y: auto;
+      border-left: 2px solid #ccc;
+      display: none;
+    }
+    #sidebar img {
+      width: 100%;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    #close-btn {
+      margin-top: 10px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="map"></div>
+    <div id="sidebar">
+      <h2 id="dest-name"></h2>
+      <img id="dest-img" src="" alt="Location Image" />
+      <p><strong>Best Route:</strong> <span id="dest-distance"></span></p>
+      <p><strong>Estimated Time:</strong> <span id="dest-time"></span></p>
+      <p><strong>Timings:</strong> <span id="dest-timings"></span></p>
+      <p id="dest-description"></p>
+      <button id="close-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
+
+  <script>
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const destinationKey = urlParams.get('destination');
+
+      const destinations = {
+    "kutir": {
+    name: "Kutir",
+    lat: 26.407645,
+    lng: 75.8608437,
+    image: "images/kutir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Parcels and Deliveries"
+},
+
+"apaji-aarogya-mandir": {
+    name: "Apaji Aarogya Mandir",
+    lat: 26.3994191,
+    lng: 75.8793084,
+    image: "images/aarogya.jpeg",
+    timings: "24 hours",
+    description: "Hospital"
+},
+
+"krishi-vigyan-kendra": {
+    name: "Krishi Vigyan Kendra",
+    lat: 26.3994191,
+    lng: 75.8793084,
+    image: "images/krishi-vigyan-kendra.jpg",
+    timings: "Not specified",
+    description: "Departments"
+},
+
+"vidya-mandir": {
+    name: "Vidya Mandir",
+    lat: 26.4031937,
+    lng: 75.8755463,
+    image: "images/Vidya_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Examination and Accounts Department"
+},
+
+"apaji": {
+    name: "Apaji",
+    lat: 26.4029485,
+    lng: 75.8756551,
+    image: "images/Apaji.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. of Mathematics and Computer Science"
+},
+
+"nursing-school": {
+    name: "Nursing School",
+    lat: 26.4022353,
+    lng: 75.8791589,
+    image: "images/nursing.jpeg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. of Medicine"
+},
+
+"bhram-mandir": {
+    name: "Bhram Mandir",
+    lat: 26.4095787,
+    lng: 75.8660177,
+    image: "images/bhram.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Temple and Pond"
+},
+
+"natyashala": {
+    name: "Natyashala",
+    lat: 26.4073686,
+    lng: 75.8613464,
+    image: "images/natyashala.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Cultural Activities"
+},
+
+"shanta-kunj": {
+    name: "Shanta Kunj",
+    lat: 26.4070804,
+    lng: 75.8619433,
+    image: "images/shanta-kunj.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Departments"
+},
+
+"khaadi-bhandar": {
+    name: "Khaadi Bhandar (Mandir)",
+    lat: 26.4067302,
+    lng: 75.8636638,
+    image: "images/khadi.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Place fot Khadi Production"
+},
+
+"karysheel-mahila-aavas": {
+    name: "Karysheel Mahila Aavas",
+    lat: 26.4070804,
+    lng: 75.8619433,
+    image: "images/karysheel-mahila-aavas.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Place fot Khadi Production"
+},
+
+"nupur-mandir": {
+    name: "Nupur Mandir",
+    lat: 26.4068953,
+    lng: 75.8640379,
+    image: "images/nupur.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Department"
+},
+
+"kala-mandir": {
+    name: "Kala Mandir",
+    lat: 26.4068953,
+    lng: 75.8640379,
+    image: "images/kala.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. fot Cultural Arts"
+},
+
+"nritya-natya-vibhag": {
+    name: "Nirtya and Natya Vibhag",
+    lat: 26.4062003,
+    lng: 75.8635106,
+    image: "images/NNV.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Dance"
+},
+
+"surya-mandir": {
+    name: "Surya Mandir",
+    lat: 26.4046743,
+    lng: 75.8713734,
+    image: "images/Surya_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "IT Dept."
+},
+
+"shakuntalam": {
+    name: "Shakuntalam",
+    lat: 26.4052152,
+    lng: 75.8715377,
+    image: "images/Shakuntalam.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Boys School"
+},
+
+"vayuyan-hanger": {
+    name: "Vayuyan Hanger",
+    lat: 26.4066749,
+    lng: 75.8717579,
+    image: "images/vayuyan.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Banasthali Air Strip"
+},
+
+"vani-mandir": {
+    name: "Vani Mandir",
+    lat: 26.404273,
+    lng: 75.872591,
+    image: "images/Vani_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Managerial Dept."
+},
+
+"pustak-mandir": {
+    name: "Pustak Mandir",
+    lat: 26.4044071,
+    lng: 75.8720906,
+    image: "images/Pustak_Bhandar.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Central Library"
+},
+
+"jeev-mandir": {
+    name: "Jeev Mandir",
+    lat: 26.4044711,
+    lng: 75.872286,
+    image: "images/Jeev_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Bioscience and Biotechnologhy"
+},
+
+"vigyan-mandir": {
+    name: "Vigyan Mandir",
+    lat: 26.4044711,
+    lng: 75.872286,
+    image: "images/Vigyan_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Chemical Department"
+},
+
+"shilp-mandir": {
+    name: "Shilp Mandir",
+    lat: 26.4037891,
+    lng: 75.8753405,
+    image: "images/shilp.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Art and Paintings"
+},
+
+"ratan-mandir": {
+    name: "Ratan Mandir",
+    lat: 26.4046364,
+    lng: 75.875487,
+    image: "images/ratan.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Department for Literature Courses"
+},
+
+"surr-mandir": {
+    name: "Surr Mandir",
+    lat: 26.4039524,
+    lng: 75.8750454,
+    image: "images/surr.jpeg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Department for Musical Arts"
+},
+
+"urja-mandir": {
+    name: "Urja Mandir",
+    lat: 26.4034722,
+    lng: 75.8757094,
+    image: "images/urja.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Electronics"
+},
+
+"bhoo-mandir": {
+    name: "Bhoo Mandir",
+    lat: 26.404127,
+    lng: 75.8758218,
+    image: "images/bhoo.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Earth Sciences"
+},
+
+"divakar-mandir": {
+    name: "Divakar Mandir",
+    lat: 26.4042579,
+    lng: 75.8763657,
+    image: "images/Automation.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Artificial Intelligence,Mechatronics & Electrical Engineering"
+},
+
+"vidhi-mandir": {
+    name: "Vidhi Mandir",
+    lat: 26.4023835,
+    lng: 75.8768055,
+    image: "images/Vidhi_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. of Law"
+},
+
+"shiksha-mandir": {
+    name: "Shiksha Mandir",
+    lat: 26.405783,
+    lng: 75.875794,
+    image: "images/shiksha.jpeg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. of Education"
+},
+
+"utkarsh-mandir": {
+    name: "Utkarsh Mandir",
+    lat: 26.4051848,
+    lng: 75.8766968,
+    image: "images/utkarsh.jpeg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "School of Architechture"
+},
+
+"karya-mandir": {
+    name: "Karya Mandir",
+    lat: 26.405191,
+    lng: 75.8771833,
+    image: "images/karya.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Engineering Workshop"
+},
+
+"vitt-mandir": {
+    name: "Vitt Mandir",
+    lat: 26.4028955,
+    lng: 75.8773612,
+    image: "images/vitt.jpeg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. of Finance"
+},
+
+"nav-mandir": {
+    name: "Nav Mandir",
+    lat: 26.4023287,
+    lng: 75.8778787,
+    image: "images/Nav_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Departments"
+},
+
+"pragya-mandir": {
+    name: "Pragya Mandir",
+    lat: 26.4021142,
+    lng: 75.8770177,
+    image: "images/Pragya_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Dept. for Management"
+},
+
+"prabha-mandir": {
+    name: "Prabha Mandir",
+    lat: 26.4014811,
+    lng: 75.8773949,
+    image: "images/Prabha_Mandir.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "Departments"
+},
+
+"guest-house": {
+    name: "Guest House",
+    lat: 26.4012665,
+    lng: 75.8778695,
+    image: "images/guest.jpg",
+    timings: "24 hours",
+    description: "A stay for Guests"
+},
+
+"sharda-mandir": {
+    name: "Sharada Mandir",
+    lat: 26.4062983,
+    lng: 75.8666277,
+    image: "images/sharda.jpg",
+    timings: "9:00 AM to 6:00 PM",
+    description: "School"
+},
+"shri-shanta-soudh": {
+    name: "Shri Shanta Soudh",
+    lat: 26.4004953,
+    lng: 75.8760013,
+    image: "images/soudh.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-ayanam": {
+    name: "Shri Shanta Ayanam",
+    lat: 26.3992671,
+    lng: 75.87635,
+    image: "images/ayanam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+"shri-shanta-aashray": {
+    name: "Shri Shanta Aashray",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/aashray.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-puram": {
+    name: "Shri Shanta Puram",
+    lat: 26.4031937,
+    lng: 75.8755463,
+    image: "images/puram.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sadam": {
+    name: "Shri Shanta Sadam",
+    lat: 26.4000118,
+    lng: 75.8757147,
+    image: "images/sadam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-niveshnam": {
+    name: "Shri Shanta Niveshnam",
+    lat: 26.3995931,
+    lng: 75.8756396,
+    image: "images/niveshnam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-ajeeram": {
+    name: "Shri Shanta Ajeeram",
+    lat: 26.3991592,
+    lng: 75.8755226,
+    image: "images/ajeeram.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-vasati": {
+    name: "Shri Shanta Vasati",
+    lat: 26.3974726,
+    lng: 75.8756383,
+    image: "images/Vasti.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-uthajam": {
+    name: "Shri Shanta Uthajam",
+    lat: 26.3969235,
+    lng: 75.8772018,
+    image: "images/uthajam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-neri": {
+    name: "Shri Shanta Neri",
+    lat: 26.3978069,
+    lng: 75.8764991,
+    image: "images/neri.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-puri": {
+    name: "Shri Shanta Puri",
+    lat: 26.4007607,
+    lng: 75.8712992,
+    image: "images/puri.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-ayatan": {
+    name: "Shri Shanta Ayatan",
+    lat: 26.4012231,
+    lng: 75.8723917,
+    image: "images/aaytan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-dhaam": {
+    name: "Shri Shanta Dhaam",
+    lat: 26.4005706,
+    lng: 75.8746411,
+    image: "images/dham.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-niketan": {
+    name: "Shri Shanta Niketan",
+    lat: 26.4012934,
+    lng: 75.8734694,
+    image: "images/niketan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-chaityam": {
+    name: "Shri Shanta Chaityam",
+    lat: 26.3998042,
+    lng: 75.8768657,
+    image: "chaityam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-gangotri": {
+    name: "Shri Shanta Gangotri",
+    lat: 26.3985428,
+    lng: 75.8752489,
+    image: "gangotri.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-peetham": {
+    name: "Shri Shanta Peetham",
+    lat: 26.3993881,
+    lng: 75.8765214,
+    image: "images/peetham.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-agar": {
+    name: "Shri Shanta Agar",
+    lat: 26.4015951,
+    lng: 75.871251,
+    image: "images/aagaar.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-alay": {
+    name: "Shri Shanta Alay",
+    lat: 26.4016425,
+    lng: 75.8707595,
+    image: "images/aalay.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-bhuvnam": {
+    name: "Shri Shanta Bhuvnam",
+    lat: 26.3992517,
+    lng: 75.8762446,
+    image: "images/bhuvnam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-geham": {
+    name: "Shri Shanta Geham",
+    lat: 26.402343,
+    lng: 75.8714981,
+    image: "images/geham.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-grah": {
+    name: "Shri Shanta Grah",
+    lat: 26.4007607,
+    lng: 75.8712992,
+    image: "images/grah.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-gram": {
+    name: "Shri Shanta Gram",
+    lat: 26.4000982,
+    lng: 75.8715419,
+    image: "images/gram.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-kulum": {
+    name: "Shri Shanta Kulum",
+    lat: 26.4012231,
+    lng: 75.8723917,
+    image: "images/Kulam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-lok": {
+    name: "Shri Shanta Lok",
+    lat: 26.3979999,
+    lng: 75.8758403,
+    image: "images/Lok.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-nagaram": {
+    name: "Shri Shanta Nagaram",
+    lat: 26.3986174,
+    lng: 75.8787297,
+    image: "images/nagaram.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-needam": {
+    name: "Shri Shanta Needam",
+    lat: 26.4019022,
+    lng: 75.8710505,
+    image: "images/nidam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-nikaye": {
+    name: "Shri Shanta Nikaye",
+    lat: 26.3972076,
+    lng: 75.8763783,
+    image: "images/nikay.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-nikunj": {
+    name: "Shri Shanta Nikunj",
+    lat: 26.4022555,
+    lng: 75.8715321,
+    image: "images/nikunj.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-nishantam": {
+    name: "Shri Shanta Nishantam",
+    lat: 26.3977914,
+    lng: 75.8749758,
+    image: "images/nishantam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-paleyam": {
+    name: "Shri Shanta Paleyam",
+    lat: 26.4056781,
+    lng: 75.8635923,
+    image: "images/paleyam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-vihar": {
+    name: "Shri Shanta Vihar",
+    lat: 26.4005706,
+    lng: 75.8746411,
+    image: "images/vihar.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-pattnam": {
+    name: "Shri Shanta Pattnam",
+    lat: 26.3988008,
+    lng: 75.8773307,
+    image: "images/patnam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sanjavnam": {
+    name: "Shri Shanta Sanjavnam",
+    lat: 26.3980557,
+    lng: 75.877962,
+    image: "images/sanjavnam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sangam": {
+    name: "Shri Shanta Sangam",
+    lat: 26.3989402,
+    lng: 75.8777618,
+    image: "images/sangam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sharanam": {
+    name: "Shri Shanta Sharanam",
+    lat: 26.3975507,
+    lng: 75.8772253,
+    image: "images/sharanam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sthanam": {
+    name: "Shri Shanta Sthanam",
+    lat: 26.3969237,
+    lng: 75.8763054,
+    image: "images/sthanam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sthaniyam": {
+    name: "Shri Shanta Sthaniyam",
+    lat: 26.3977919,
+    lng: 75.8749762,
+    image: "images/sthaniyam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-tirtham": {
+    name: "Shri Shanta Tirtham",
+    lat: 26.3971922,
+    lng: 75.875567,
+    image: "images/teertham.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-vasam": {
+    name: "Shri Shanta Vasam",
+    lat: 26.3985858,
+    lng: 75.8764156,
+    image: "images/vasam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-vastyam": {
+    name: "Shri Shanta Vastyam",
+    lat: 26.3991469,
+    lng: 75.877123,
+    image: "images/vatsyan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sadan": {
+    name: "Shri Shanta Sadan",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/sadan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-bhavan": {
+    name: "Shri Shanta Bhavan",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/bhavan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-sharan": {
+    name: "Shri Shanta Sharan",
+    lat: 26.4056099,
+    lng: 75.8638088,
+    image: "images/sharan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-upvan": {
+    name: "Shri Shanta Upvan",
+    lat: 26.4056099,
+    lng: 75.8638088,
+    image: "images/upvan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-prangan": {
+    name: "Shri Shanta Prangan",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/prangan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-prasad": {
+    name: "Shri Shanta Prasad",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/prasad.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-aangan": {
+    name: "Shri Shanta Aangan",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/aangan.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-aawas": {
+    name: "Shri Shanta Aawas",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/aawas.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-niwas": {
+    name: "Shri Shanta Niwas",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/niwas.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+
+"shri-shanta-nilay": {
+    name: "Shri Shanta Nilay",
+    lat: 26.4050806,
+    lng: 75.8650992,
+    image: "images/nilay.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+"shri-shanta-nigam": {
+    name: "Shri Shanta Nigam",
+    lat: 26.3992732,
+    lng: 75.8773668,
+    image: "images/Nigam.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Hostels"
+},
+"medical-shop": {
+    name: "Medical Shop",
+    lat: 26.3994191,
+    lng: 75.8793084,
+    image: "images/medical.jpeg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Medical"
+},
+
+"banasthali-book-center": {
+    name: "Banasthali Book Center",
+    lat: 26.4024831,
+    lng: 75.8758128,
+    image: "images/BBC.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Print outs and Photocopy"
+},
+
+"banasthali-computer-center": {
+    name: "Banasthali Computer Center",
+    lat: 26.4022946,
+    lng: 75.8761731,
+    image: "images/BCC.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Stationary"
+},
+
+"new-market": {
+    name: "New Market",
+    lat: 26.4012522,
+    lng: 75.8754734,
+    image: "imageS/New_market.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Markets"
+},
+
+"shanus": {
+    name: "Shanus",
+    lat: 26.4013229,
+    lng: 75.8754488,
+    image: "images/shanus.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"fun-and-frolics": {
+    name: "Fun and Frolics",
+    lat: 26.4013229,
+    lng: 75.8754488,
+    image: "images/ff.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"annapurna-canteen": {
+    name: "Annapurna Canteen",
+    lat: 26.4015608,
+    lng: 75.8744055,
+    image: "images/annapurna.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"bella-bites": {
+    name: "Bella Bites",
+    lat: 26.4021634,
+    lng: 75.8730616,
+    image: "images/bella.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"pooja-jewellery-shop": {
+    name: "Pooja Jewellery Shop",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/pooja.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Jewellery and Makeup "
+},
+
+"mohit-photo-studio": {
+    name: "Mohit Photo Studio",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/mohit.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Photo studio and frames"
+},
+
+"ujjwala": {
+    name: "Ujjwala",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/ujjwala.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Cloth Cleaning"
+},
+
+"desi-zayka": {
+    name: "Desi Zayka",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/Desi_Zayka.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"mukhteshwari-canteen": {
+    name: "Mukhteshwari Canteen",
+    lat: 26.4030084,
+    lng: 75.8707062,
+    image: "images/Canteen.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description:"Canteen"
+},
+
+"spicy-bite": {
+    name: "Spicy Bite",
+    lat: 26.4030084,
+    lng: 75.8707062,
+    image: "images/Canteen.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Canteen"
+},
+
+"old-market": {
+    name: "Old Market",
+    lat: 26.4076967,
+    lng: 75.8617962,
+    image: "images/old-market.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Markets"
+},
+
+"anandam-juice-corner": {
+    name: "Anandam Juice Corner",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/Anandam.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Juice Corner"
+},
+
+"digital-world": {
+    name: "Digital World",
+    lat: 26.4024364,
+    lng: 75.8725357,
+    image: "images/Digital_World.jpg",
+    timings: "10:00 AM to 8:00 PM",
+    description: "Market for Phones,Laptops and other tech accessories"
+},
+"banasthali-gym": {
+    name: "Banasthali Gym",
+    lat: 26.4005706,
+    lng: 75.8746411,
+    image: "images/gym.jpg",
+    timings: "6:00 AM to 8:00 AM & 5:30 PM to 8:00 PM",
+    description: "Grounds"
+},
+
+"vidula-maidan": {
+    name: "Vidula Maidan",
+    lat: 26.4003471,
+    lng: 75.8736882,
+    image: "images/vidula.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Grounds"
+},
+
+"basketball-court-1": {
+    name: "Basket Ball Court 1",
+    lat: 75.8736882,
+    lng: 75.8746905,
+    image: "images/bb1.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Grounds"
+},
+
+"basketball-court-2": {
+    name: "Basket Ball Court 2",
+    lat: 26.3997064,
+    lng: 75.8749478,
+    image: "images/bb2.jpg",
+    timings: "6:00 AM to 8:00 PM",
+    description: "Grounds"
+},
+
+"judo-center": {
+    name: "Banasthali Judo Center",
+    lat: 26.4005706,
+    lng: 75.8746411,
+    image: "images/judo.jpg",
+    timings: "5:00 PM to 7:00 PM",
+    description: "Grounds"
+},
+
+"yoga-building": {
+    name: "Banasthali Yoga Building",
+    lat: 26.4005706,
+    lng: 75.8746411,
+    image: "images/yoga.jpg",
+    timings: "5:00 PM to 7:00 PM",
+    description: "Grounds"
+},
+
+"horse-riding-ground": {
+    name: "Horse Riding Ground",
+    lat: 26.4050709,
+    lng: 75.8743511,
+    image: "images/Horse_Riding.jpg",
+    timings: "5:00 AM to 7:00 PM",
+    description: "Grounds"
+},
+
+"shooting-range": {
+    name: "Shooting Range",
+    lat: 26.405135,
+    lng: 75.8744208,
+    image: "images/Shooting_Range.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+},
+
+"cricket-ground": {
+    name: "Cricket Ground",
+    lat: 26.4060833,
+    lng: 75.8710978,
+    image: "images/Cricket_Gound.jpg",
+    timings: "5:00 AM to 7:00 PM",
+    description: "Grounds"
+},
+
+"swimming-pool": {
+    name: "Swimming Pool",
+    lat: 26.4059884,
+    lng: 75.8704927,
+    image: "images/Swimming_pool.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+},
+
+"air-strip": {
+    name: "Banasthali Air Strip",
+    lat: 26.4066749,
+    lng: 75.8717579,
+    image: "images/vayu.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+},
+
+"nehru-park": {
+    name: "Nehru Park",
+    lat: 26.4051719,
+    lng: 75.8670134,
+    image: "images/nehru.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+},
+
+"gandhi-park": {
+    name: "Gandhi Park",
+    lat: 26.4051719,
+    lng: 75.8670134,
+    image: "images/gandhi.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+},
+
+"rani-lakshmi-bai-maidan": {
+    name: "Rani Lakshmi Bai Maidan",
+    lat: 26.4084956,
+    lng: 75.8624004,
+    image: "images/laxmi.jpg",
+    timings: "6:00 AM to 6:00 PM",
+    description: "Grounds"
+}
+      }
+
+      const destination = destinations[destinationKey];
+      if (!destination) {
+        alert("Invalid Destination!");
+        return;
+      }
+
+      const sidebar = document.getElementById("sidebar");
+      const destName = document.getElementById("dest-name");
+      const destImg = document.getElementById("dest-img");
+      const destDistance = document.getElementById("dest-distance");
+      const destTime = document.getElementById("dest-time");
+      const destTimings = document.getElementById("dest-timings");
+      const destDesc = document.getElementById("dest-description");
+
+      const map = L.map("map").setView([destination.lat, destination.lng], 17);
+      L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 20
+      }).addTo(map);
+
+      let userMarker = null;
+      let lastUserPosition = null;
+      let routingControl;
+
+      const destMarker = L.marker([destination.lat, destination.lng])
+        .addTo(map)
+        .bindPopup("Destination: " + destination.name)
+        .on("click", () => {
+          if (lastUserPosition) {
+            const { latitude, longitude } = lastUserPosition.coords;
+            showRoute(latitude, longitude, destination);
+            updateSidebarContent();
+          }
+        });
+
+      function updateSidebarContent(distance = 0, duration = 0) {
+        sidebar.style.display = "block";
+        destName.innerText = destination.name;
+        destImg.src = destination.image;
+        destDistance.innerText = distance ? distance.toFixed(2) + " km" : "";
+        destTime.innerText = duration ? Math.round(duration) + " min" : "";
+        destTimings.innerText = destination.timings;
+        destDesc.innerText = destination.description;
+      }
+
+      function showRoute(userLat, userLng, dest) {
+        if (routingControl) {
+          map.removeControl(routingControl);
+        }
+
+        routingControl = L.Routing.control({
+          waypoints: [
+            L.latLng(userLat, userLng),
+            L.latLng(dest.lat, dest.lng)
+          ],
+          routeWhileDragging: false,
+          showAlternatives: true,
+          fitSelectedRoutes: true,
+          altLineOptions: {
+            styles: [{ color: 'gray', opacity: 0.7, weight: 4 }]
+          },
+          lineOptions: {
+            styles: [{ color: 'blue', weight: 5 }]
+          },
+          createMarker: () => null
+        }).on('routesfound', function (e) {
+          const best = e.routes[0];
+          const distance = best.summary.totalDistance / 1000;
+          const duration = best.summary.totalTime / 60;
+          updateSidebarContent(distance, duration);
+        }).addTo(map);
+      }
+
+      function updateUserPosition(position) {
+        const { latitude, longitude } = position.coords;
+        lastUserPosition = position;
+
+        if (!userMarker) {
+          userMarker = L.marker([latitude, longitude]).addTo(map).bindPopup("You are here").openPopup();
+        } else {
+          userMarker.setLatLng([latitude, longitude]);
+        }
+      }
+
+      const constantUserPos = {
+        coords: {
+          latitude: 26.4029485,
+          longitude: 75.8756551
+        }
+      };
+      updateUserPosition(constantUserPos);
+
+      document.getElementById("close-btn").onclick = () => {
+        sidebar.style.display = "none";
+      };
+    };
+  </script>
+</body>
+</html>
